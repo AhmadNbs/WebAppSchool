@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        /* Navbar styles */
+        .navbar {
+            background-color: #333;
+            padding: 10px 0;
+        }
+        .navbar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        .navbar ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+        .navbar ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .navbar ul li a:hover {
+            background-color: #555;
+        }
+
+        /* Content area styles */
+        .content {
+            margin-top: 20px;
+            text-align: center;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        table th {
+            background-color: #333;
+            color: #fff;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        form input, form textarea, form select, form button {
+            margin-bottom: 10px;
+            padding: 5px;
+            width: 200px;
+        }
+        form button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        form button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <ul>
+        <li><a th:href="@{/users/getAllUsers}">Users</a></li>
+        <li><a th:href="@{/classes/getAllClasses}">Classes</a></li>
+        <li><a th:href="@{/schedules/getAllSchedules}">Schedules</a></li>
+        <li><a th:href="@{/subjects/getAllSubjects}">Subjects</a></li>
+        <li><a th:href="@{/marks/getAllMarks}">Marks</a></li>
+        <li><a th:href="@{/classes/getClasses}">Class</a></li>
+    </ul>
+</nav>
+
+</body>
+</html>

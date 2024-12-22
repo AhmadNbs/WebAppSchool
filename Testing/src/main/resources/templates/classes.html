@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classes Management</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <style>
+        /* Basic styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        td:last-child {
+            text-align: center;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        /* Modal styles */
+        .bodyModal, .bodyModalStudent, .bodyModalProfessor {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .contentModal {
+            background-color: #f4f4f4;
+            width: 60%;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .closeModal, .closeModalStudent, .closeModalProfessor {
+            color: #bb7a2a;
+            float: right;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Classes Management</h1>
+
+<!-- Add New Class Form -->
+<h2>Add New Class</h2>
+<form id="addClassForm" method="post" th:action="@{/classes/save-class}">
+    <input type="number" id="grade" name="grade" placeholder="Class Grade" style="width: 50%;" required>
+    <input type="text" id="number" name="number" placeholder="Room Number" style="width: 50%;" required>
+    <button type="submit">Add Class</button>
+</form>
+
+<!-- Display All Classes -->
+<table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th>ID</th>
+        <th>Class Grade</th>
+        <th>Room Number</th>
+        <th>Students</th>
+        <th>Professors</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="class: ${classes}">
+        <td th:text="${class.id}"></td>
+        <td th:text="${class.grade}"></td>
+        <td th:text="${class.number}"></td>
+        <td>
+            <table>
+                <tr th:each="student:${class.users}" th:if="${student.role == 'student'}">
+                    <td th:text="${student.firstName} + ' ' + ${student.lastName}"></td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table>
+                <tr th:each="professor:${class.users}" th:if="${professor.role == 'professor'}">
+                    <td th:text="${professor.firstName} + ' ' + ${professor.lastName}"></td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <button name="editButton" class="btn btn-primary">Edit</button>
+
+            <!-- Modal -->
+            <div class="bodyModal">
+                <div class="contentModal">
+                    <span class="closeModal">×</span>
+                    <h1>Modify Class</h1>
+                    <form method="post" th:action="@{/classes/update-class/{id}(id=${class.id})}">
+                        <input name="id" type="text" th:value="${class.id}" disabled>
+                        <input name="grade" type="text" th:value="${class.grade}" required>
+                        <input name="number" type="text" th:value="${class.number}" required>
+                        <button type="submit" class="btn btn-success">Apply</button>
+                    </form>
+                </div>
+            </div>
+
+            <form method="post" th:action="@{/classes/delete-class/{id}(id=${class.id})}">
+                <button type="submit" class="btn btn-danger">DELETE</button>
+            </form>
+
+            <button name="addStudent" class="btn btn-info">Add Student</button>
+            <div class="bodyModalStudent">
+                <div class="contentModal">
+                    <span class="closeModalStudent">×</span>
+                    <h1>Add Student</h1>
+                    <form onsubmit="return addStudent(this)" method="post" th:action="@{/classes/addStudent/{idClass}(idClass=${class.id})}">
+                        <input name="id" type="text" th:value="${class.id}" disabled>
+                        <select name="choose" class="form-control">
+                            <option th:value="'0'" th:text="'Select a student'"></option>
+                            <!-- Filter and iterate over only students with role "student" -->
+                            <option th:each="student : ${students}" th:if="${student.role == 'student'}" th:value="${student.id}" th:text="${student.firstName} + ' ' + ${student.lastName}"></option>
+                        </select>
+                        <button type="submit" class="btn btn-success">Apply</button>
+                    </form>
+                </div>
+            </div>
+
+            <button name="addProfessor" class="btn btn-warning">Add Professor</button>
+            <div class="bodyModalProfessor">
+                <div class="contentModal">
+                    <span class="closeModalProfessor">×</span>
+                    <h1>Add Professor</h1>
+                    <form onsubmit="return addProfessor(this)" method="post" th:action="@{/classes/addProfessor/{idClass}(idClass=${class.id})}">
+                        <input name="id" type="text" th:value="${class.id}" disabled>
+                        <select name="choose professor" class="form-control">
+                            <option th:value="'0'" th:text="'Select a professor'"></option>
+                            <!-- Filter and iterate over only professors -->
+                            <option th:each="professor : ${professors}" th:if="${professor.role == 'professor'}" th:value="${professor.id}" th:text="${professor.firstName} + ' ' + ${professor.lastName}"></option>
+                        </select>
+                        <button type="submit" class="btn btn-success">Apply</button>
+                    </form>
+                </div>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    var modifyButtons = window.document.getElementsByName("editButton");
+    var modifyModals = window.document.getElementsByClassName("bodyModal");
+    var closeModals = window.document.getElementsByClassName("closeModal");
+
+    var addButtonsStudent = window.document.getElementsByName("addStudent");
+    var addModalsStudent = window.document.getElementsByClassName("bodyModalStudent");
+    var closeModalsStudent = window.document.getElementsByClassName("closeModalStudent");
+
+    var addButtonsProfessor = window.document.getElementsByName("addProfessor");
+    var addModalsProfessor = window.document.getElementsByClassName("bodyModalProfessor");
+    var closeModalsProfessor = window.document.getElementsByClassName("closeModalProfessor");
+
+    var addSelected = window.document.getElementsByName("choose");
+    var addSelectedProf = window.document.getElementsByName("choose professor");
+
+    var selectedStudent = '0';
+    var selectedProfessor = '0';
+
+    for (let i = 0; i < modifyButtons.length; i++) {
+        modifyButtons[i].onclick = function () {
+            modifyModals[i].style.display = "block";
+        }
+
+        closeModals[i].onclick = function () {
+            modifyModals[i].style.display = "none";
+        }
+
+        addSelected[i].onchange = function () {
+            selectedStudent = addSelected[i].value;
+        }
+
+        addSelectedProf[i].onchange = function () {
+            selectedProfessor = addSelectedProf[i].value;
+        }
+    }
+
+    for (let i = 0; i < addButtonsStudent.length; i++) {
+        addButtonsStudent[i].onclick = function () {
+            addModalsStudent[i].style.display = "block";
+        }
+
+        closeModalsStudent[i].onclick = function () {
+            addModalsStudent[i].style.display = "none";
+        }
+    }
+
+    for (let i = 0; i < addButtonsProfessor.length; i++) {
+        addButtonsProfessor[i].onclick = function () {
+            addModalsProfessor[i].style.display = "block";
+        }
+
+        closeModalsProfessor[i].onclick = function () {
+            addModalsProfessor[i].style.display = "none";
+        }
+    }
+
+    function addStudent(form) {
+        if (selectedStudent === '0') {
+            alert("Student is not selected!");
+            return false;
+        }
+        form.action = form.action + "/" + selectedStudent;
+        return true;
+    }
+
+    function addProfessor(form) {
+        if (selectedProfessor === '0') {
+            alert("Professor is not selected!");
+            return false;
+        }
+        form.action = form.action + "/" + selectedProfessor;
+        return true;
+    }
+</script>
+
+</body>
+</html>

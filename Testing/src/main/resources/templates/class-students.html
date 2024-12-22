@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Management</title>
+    <style>
+        /* Basic styles */
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #555;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-family: 'Open Sans', Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-spacing: 0;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        td:last-child {
+            text-align: center;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+        button[type="button"] {
+            background-color: #e67e22;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button[type="button"]:hover {
+            background-color: #d35400;
+        }
+        .mark-select {
+            background-color: #ecf0f1;
+            color: #333;
+            border: 1px solid #bdc3c7;
+        }
+        .mark-select:hover {
+            border-color: #7f8c8d;
+        }
+        .add-mark-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .add-mark-btn:hover {
+            background-color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+
+<form id="markForm" method="post">
+    <h1>Class Management</h1>
+    <table id="markTable">
+        <thead>
+        <tr>
+            <th>Class: <span th:text="${class.grade + '/' + class.number}"></span></th>
+            <th>Marks for Subject: <span th:text="${subject.name}"></span></th>
+        </tr>
+        <tr>
+            <th>Student Name</th>
+            <th>Mark</th>
+            <th>Add Mark</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate over the list of students and display their names -->
+        <tr th:each="student : ${students}">
+            <td th:text="${student.firstName} + ' ' + ${student.lastName}"></td>
+            <td>
+                <table>
+                    <tr th:each="mark:${student.marks}">
+                        <th:block th:if="${mark.key.id == subject.id}">
+                            <td th:text="${mark.value.nota}"></td>
+                        </th:block>
+                    </tr>
+                </table>
+            </td>
+            <!-- Display dropdown select for mark -->
+            <td>
+                <select class="mark-select" name="mark" data-studentid="${student.id}" data-subjectid="${subject.id}">
+                    <option value="">Select Mark</option>
+                    <!-- Iterate over the list of available marks -->
+                    <option th:each="mark : ${marks}" th:value="${mark.id}">
+                        <span th:text="${mark.nota}"></span>
+                    </option>
+                </select>
+            </td>
+            <!-- Add hidden input fields to capture student, mark, and subject IDs -->
+            <td>
+                <input type="hidden" name="studentId" th:value="${student.id}">
+                <input type="hidden" name="subjectId" th:value="${subject.id}">
+                <input type="hidden" name="classId" th:value="${class.id}">
+                <button class="add-mark-btn" type="button" onclick="addMark(this)">Add/Edit Mark</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+
+<script>
+    function addMark(button) {
+        var row = button.closest("tr");
+        var markSelect = row.querySelector(".mark-select");
+        var studentId = row.querySelector("input[name='studentId']").value; // Retrieve student ID from hidden input
+        var subjectId = row.querySelector("input[name='subjectId']").value; // Retrieve subject ID from  hidden input
+        var classId = row.querySelector("input[name='classId']").value;
+        var selectedMark = markSelect.value; // Get the selected mark ID
+
+        if (selectedMark === '') {
+            alert("Mark is not selected!");
+            return;
+        }
+
+        // Set the form action dynamically
+        var form = document.getElementById("markForm");
+        form.action = '/classes/submitMarks/' + studentId + '/' + subjectId + '/' + selectedMark + '/' + classId;
+        form.submit(); // Submit the form
+    }
+</script>
+
+</body>
+</html>

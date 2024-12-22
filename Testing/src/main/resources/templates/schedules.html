@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      rel="stylesheet" id="bootstrap-css">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedules Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Basic styles */
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-family: 'Open Sans', Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        td:last-child {
+            text-align: center;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: #2ecc71;
+            outline: none;
+        }
+        button[type="submit"] {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #2ecc71;
+        }
+        .bodyModal {
+        display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+    }
+
+    .bodyModalSubject {
+        display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+    }
+
+    .bodyModalClass {
+        display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+    }
+
+    .bodyModalProfessor {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+    }
+
+        .contentModal {
+        background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+        .closeModal {
+        color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+    }
+        .closeModalSubject {
+        color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+    }
+        .closeModalClass {
+        color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+    }
+        .closeModalProfessor {
+            color: #bb7a2a;
+            float: right;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+    }
+    </style>
+</head>
+<body>
+
+<h1>Schedules Management</h1>
+
+<!-- Add New User Form -->
+<h2>Add New Schedule</h2>
+<form id="addScheduleForm" method="post" th:action="@{/schedules/save-schedule}">
+    <select id="day" name="day" style="width: 50%;" required>
+        <option value="" disabled selected>Select a day</option>
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+    </select>
+    <!-- <input type="text" id="time" name="time" placeholder="Time" style="width: 50%;" required> !-->
+    <select id="time" name="time" style="width: 50%;" required>
+        <option value="" disabled selected>Select time</option>
+        <option value="08:00">08:00</option>
+        <option value="08:45">08:45</option>
+        <option value="09:45">09:45</option>
+        <option value="10:30">10:30</option>
+        <option value="10:45">10:45</option>
+        <option value="11:30">11:30</option>
+        <option value="12:15">12:15</option>
+        <option value="13:15">13:15</option>
+    </select>
+    <button type="submit">Add Schedule</button>
+</form>
+
+
+<!-- Display All Users -->
+<table id="schedulesTable" class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th>ID</th>
+        <th>Day</th>
+        <th>Time</th>
+        <th>Subject</th>
+        <th>Class/Room</th>
+        <th>Professor</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="schedule: ${schedules}">
+        <td th:text="${schedule.id}"></td>
+        <td th:text="${schedule.day}"></td>
+        <td th:text="${schedule.time}"></td>
+        <td th:if="${schedule.materia != null}"
+            th:text="${schedule.materia.name}"></td>
+        <td th:unless="${schedule.materia != null}"
+            th:text="'No subject assigned'"></td>
+        <td>
+            <table>
+                <tr th:each="class:${schedule.clasa}">
+                    <td th:text="${class.grade} + '_' + ${class.number}"></td>
+                </tr>
+            </table>
+        </td>
+        <td th:if="${schedule.user != null}"
+            th:text="${schedule.user.firstName + ' ' + schedule.user.lastName}">
+
+        </td>
+        <td th:unless="${schedule.user != null}"
+            th:text=" '' ">
+        </td>
+
+        <td>
+            <button name="editButton" class="btn btn-primary">Edit</button>
+
+            <div class="bodyModal">
+                <div class="contentModal">
+                    <span class="closeModal">Exit</span>
+
+                    <h1>Modify Schedule</h1>
+
+                    <form method="post" th:action="@{/schedules/update-schedule/{id}(id=${schedule.id})}">
+                        <input name="id" type="text" th:value="${schedule.id}" disabled>
+                        <input name="day" type="text" th:value="${schedule.day}" required>
+                        <input name="time" type="text" th:value="${schedule.time}" required>
+                        <button type="submit">apply</button>
+                    </form>
+                </div>
+            </div>
+
+            <form method="post" th:action="@{/schedules/delete-schedule/{id}(id=${schedule.id})}">
+                <button type="submit" class="btn btn-danger">DELETE</button>
+            </form>
+
+            <button name="addSubject" class="btn btn-warning">Add/Edit Subject</button>
+            <div class="bodyModalSubject">
+                <div class="contentModal">
+                    <span class="closeModalSubject" th:style="${'cursor: pointer;'}">Exit</span>
+
+                    <h1>Add Subject</h1>
+
+                    <form onsubmit="return addSubject(this)" method="post" th:action="@{/schedules/addSubject/{idSchedule}(idSchedule=${schedule.id})}">
+                        <input name="id" type="text" th:value="${schedule.id}" disabled>
+                        <select name="choose subject">
+                            <option th:value="'0'" th:text="'Select a subject'"></option>
+                            <option th:each="subject : ${subjects}" th:value="${subject.id}" th:text="${subject.name}"></option>
+                        </select>
+                        <button type="submit" class="btn btn-success">apply</button>
+                    </form>
+                </div>
+            </div>
+            <button name="addClass" class="btn btn-warning">Add/Edit Class</button>
+            <div class="bodyModalClass">
+                <div class="contentModal">
+                    <span class="closeModalClass" th:style="${'cursor: pointer;'}">Exit</span>
+
+                    <h1>Add Class</h1>
+
+                    <form onsubmit="return addClass(this)" method="post" th:action="@{/schedules/addClass/{idSchedule}(idSchedule=${schedule.id})}">
+                        <input name="id" type="text" th:value="${schedule.id}" disabled>
+                        <select name="choose class">
+                            <option th:value="'0'" th:text="'Select a class'"></option>
+                            <option th:each="class : ${classes}" th:value="${class.id}" th:text="${class.grade} + '_' + ${class.number}"></option>
+                        </select>
+                        <button type="submit" class="btn btn-success">apply</button>
+                    </form>
+                </div>
+            </div>
+
+            <button name="addProfessor" class="btn btn-warning">Add/Edit Professor</button>
+            <div class="bodyModalProfessor">
+                <div class="contentModal">
+                    <span class="closeModalProfessor">×</span>
+                    <h1>Add Professor</h1>
+                    <form onsubmit="return addProfessor(this)" method="post" th:action="@{/schedules/addProfessor/{idSchedule}(idSchedule=${schedule.id})}">
+                        <input name="id" type="text" th:value="${schedule.id}" disabled>
+                        <select name="choose professor" class="form-control">
+                            <option th:value="'0'" th:text="'Select a professor'"></option>
+                            <!-- Filter and iterate over only professors -->
+                            <option th:each="professor : ${professors}" th:value="${professor.id}" th:text="${professor.firstName} + ' ' + ${professor.lastName}"></option>
+                        </select>
+                        <button type="submit" class="btn btn-success">Apply</button>
+                    </form>
+                </div>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+
+<script>
+    var modifyButtons = window.document.getElementsByName("editButton");
+    var modifyModals = window.document.getElementsByClassName("bodyModal");
+    var closeModals = window.document.getElementsByClassName("closeModal");
+
+    var addButtonSubject = window.document.getElementsByName("addSubject");
+    var addModalSubject = window.document.getElementsByClassName("bodyModalSubject");
+    var closeModalSubject = window.document.getElementsByClassName("closeModalSubject");
+
+    var addButtonClass = window.document.getElementsByName("addClass");
+    var addModalClass = window.document.getElementsByClassName("bodyModalClass");
+    var closeModalClass = window.document.getElementsByClassName("closeModalClass");
+
+    var addButtonsProfessor = window.document.getElementsByName("addProfessor");
+    var addModalsProfessor = window.document.getElementsByClassName("bodyModalProfessor");
+    var closeModalsProfessor = window.document.getElementsByClassName("closeModalProfessor");
+
+    var addSelectedSubject = window.document.getElementsByName("choose subject");
+    var addSelectedClass = window.document.getElementsByName("choose class");
+    var addSelectedProf = window.document.getElementsByName("choose professor");
+
+    var selectedSubject = '0';
+    var selectedClass = '0';
+    var selectedProfessor = '0';
+
+    for(let i = 0; i<modifyButtons.length ; i++)
+    {
+      modifyButtons[i].onclick = function () {
+        modifyModals[i].style.display="block";
+      }
+
+      closeModals[i].onclick = function () {
+        modifyModals[i].style.display="none";
+      }
+      addSelectedSubject[i].onchange=function(){
+        selectedSubject=addSelectedSubject[i].value;
+        console.log(selectedSubject);
+      }
+
+      addSelectedClass[i].onchange=function(){
+        selectedClass=addSelectedClass[i].value;
+        console.log(selectedClass);
+      }
+      addSelectedProf[i].onchange = function () {
+            selectedProfessor = addSelectedProf[i].value;
+            console.log(selectedProfessor);
+        }
+    }
+
+    for(let i=0 ; i<addButtonSubject.length ; i++)
+    {
+        addButtonSubject[i].onclick = function(){
+            addModalSubject[i].style.display="block";
+        }
+        closeModalSubject[i].onclick = function () {
+        addModalSubject[i].style.display="none";
+      }
+    }
+
+    for(let i=0 ; i<addButtonClass.length ; i++)
+    {
+        addButtonClass[i].onclick = function(){
+            addModalClass[i].style.display="block";
+        }
+        closeModalClass[i].onclick = function () {
+        addModalClass[i].style.display="none";
+      }
+    }
+
+    for (let i = 0; i < addButtonsProfessor.length; i++) {
+        addButtonsProfessor[i].onclick = function () {
+            addModalsProfessor[i].style.display = "block";
+        }
+
+        closeModalsProfessor[i].onclick = function () {
+            addModalsProfessor[i].style.display = "none";
+        }
+    }
+
+    function addSubject(form)
+    {
+        if(selectedSubject === '0')
+        {
+        alert("Subject is not selected!");
+         return false;
+        }
+        form.action=form.action+"/"+selectedSubject;
+        return true;
+    }
+
+    function addClass(form)
+    {
+        if(selectedClass === '0')
+        {
+        alert("Class is not selected!");
+         return false;
+        }
+        form.action=form.action+"/"+selectedClass;
+        return true;
+    }
+
+    function addProfessor(form) {
+        if (selectedProfessor === '0') {
+            alert("Professor is not selected!");
+            return false;
+        }
+        form.action = form.action + "/" + selectedProfessor;
+        return true;
+    }
+</script>
+
+</body>
+</html>

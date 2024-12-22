@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Master</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style th:inline="text">
+        /* Import Thymeleaf's syntax for inline CSS */
+        /* Use Thymeleaf's syntax for setting dynamic attribute values */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            text-align: center;
+            margin-top: 100px;
+        }
+        h1 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        .button {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<!-- Main Content -->
+<div class="container">
+    <h1>Welcome to School Master</h1>
+    <div class="buttons">
+        <!-- Use Thymeleaf's syntax for dynamic URLs -->
+        <a class="button" th:href="@{/users/professor-login}">Professor</a>
+        <a class="button" th:href="@{/users/student-login}">Student</a>
+        <a class="button" th:href="@{/users/admin-login}">Admin</a>
+    </div>
+</div>
+</body>
+</html>

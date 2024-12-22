@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .table-container {
+            margin-bottom: 20px; /* Add space between the tables */
+        }
+
+        h1 {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #009688;
+        }
+
+        h2 {
+            font-size: 20px;
+            color: #009688;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #009688;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+<div class="table-container">
+    <h1>Welcome, <span th:text="${student.firstName} + ' ' + ${student.lastName}" style="color: #009688;"></span>! </h1>
+
+    <!-- Table: Subjects and Marks -->
+    <h2>Marks Record</h2>
+    <table>
+        <thead>
+        <tr>
+            <!-- Display subject names in the header row -->
+            <th th:each="subject : ${subjects}" th:text="${subject.name}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <!-- Iterate over subjects -->
+            <td th:each="subject : ${subjects}">
+                <!-- Iterate over marks and find matching mark for the current subject -->
+                <span th:each="mark : ${student.marks}">
+                <!-- Check if mark key (subject) matches the current subject -->
+                    <span th:text="${mark.key.id == subject.id ? mark.value.nota : ''}"></span>
+                </span>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+
+<!-- Student Schedule -->
+<div class="table-container">
+    <h2>Student Schedule , Class: <span th:text="${class.grade}"></span> / Room: <span th:text="${class.number}"></span> </h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Day</th>
+            <th th:each="time : ${timesSchedule}" th:text="${time}" style="background-color: #009688; color: white;"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="dayS : ${daysSchedule}">
+            <td th:text="${dayS}" style="font-weight: bold;"></td>
+            <td th:each="timeS : ${timesSchedule}">
+                <span th:each="schedule : ${schedules}"
+                      th:if="${schedule.day == dayS and schedule.time == timeS}">
+                        <span th:text="${schedule.materia.name}" style="color: #009688;"></span>
+                    </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
